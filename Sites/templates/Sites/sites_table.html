@@ -1,0 +1,216 @@
+<div class="row">
+  <table class="table table-dark table-hover border-0 rounded">
+      <thead>
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">Frontend Address</th>
+          <th scope="col">Backend servers</th>
+          <th scope="col">Certificate up to date?</th>
+          <th scope="col">Last time edited/created</th>
+          <th scope="col">Created by:</th>
+          <th scope="col">Managed by:</th>
+          <th scope="col" class="d-flex justify-content-between align-items-center">Action<span><a href="{% url 'create_new_site' %}" class="btn btn-primary">Create a new site</a></span></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for site in sites %}
+        <tr class="align-middle">
+          <td></td>
+          
+          <td>
+              {{ site.site_address }}
+              {% if site.disabled == 'Yes' %}
+              <span class="badge badge-danger">disabled</span>
+              {% endif %}
+              {% if site.under_maintenance == 'Yes' %}
+              <span class="badge badge-warning">maintenance</span>
+              {% endif %}
+              <br>
+              {% if site.www_redirect == 'Yes' %}
+              <span class="badge badge-success">www redirection</span>
+              <br>
+              {% endif %}
+          </td>
+          
+          <td>
+              {% for backend_server in site.backend_servers.all %}
+              {{ backend_server.backend_server_name }}
+              <br>
+              
+              {% if backend_server.backend_enabled == 'No' %}
+              <span class="badge badge-secondary">disabled</span>
+              {% elif backend_server.probe_status == 'active' %}
+              <span class="badge badge-success">active</span>
+              {% else %}
+              <span class="badge badge-danger">failed</span>
+              {% endif %}
+              
+              {% if backend_server.http_encryption == 'HTTPs' %}
+              <span class="badge badge-success">HTTPs</span>
+              {% else %}
+              <span class="badge badge-secondary">HTTP</span>
+              {% endif %}
+
+              {% if backend_server.http_version == 'HTTP/2' %}
+              <span class="badge badge-success">HTTP/2</span>
+              {% else %}
+              <span class="badge badge-secondary">HTTP/1</span>
+              {% endif %}
+              
+              {% if not forloop.last %}<br><br>{% endif %}
+              {% endfor %}
+              <br>
+              
+          </td>
+          
+          <td>
+              {% if date_now|date:'Y-m-d' < site.certificate_address.expiration_date|date:'Y-m-d' %}
+              <span class="badge badge-success">Valid until: {{ site.certificate_address.expiration_date }}</span>
+              {% else %}
+              <span class="badge badge-danger">Expired: {{ site.certificate_address.expiration_date }}</span>
+              {% endif %}
+              <br>
+              <span class="badge badge-secondary">Last time renewed at: {{ site.certificate_address.last_time_renewed }}</span>
+          </td>
+          
+          <td>
+              <span class="badge badge-secondary">Edited at: {{ site.date_edited }}</span>
+              <br>
+              <span class="badge badge-secondary">Created at: {{ site.date_edited }}</span>
+          </td>
+          
+          <td>
+              {{ site.created_by.username }}
+              {% if site.created_by.role == "Superadmin" %}
+              <span class="badge badge-primary">superadmin</span>
+              {% elif site.created_by.role == "Admin" %}
+              <span class="badge badge-success">admin</span>
+              {% else %}
+              <span class="badge badge-warning">user</span>
+              {% endif %}
+          </td>
+          
+          <td>
+              {% for admin_user in site.admin_users.all %}
+              {{ admin_user.username }}
+              <span class="badge badge-success">admin</span>
+              <br>
+              {% endfor %}
+              
+              {% for read_write_user in site.read_write_users.all %}
+              {{ read_write_user.username }}
+              <span class="badge badge-warning">read-write</span>
+              <br>
+              {% endfor %}
+
+              {% for read_only_user in site.read_only_users.all %}
+              {{ read_only_user.username }}
+              <span class="badge badge-info">read-only</span>
+              <br>
+              {% endfor %}
+          </td>
+          
+          <td>
+              <div class="btn-group d-flex along" role="group" aria-label="Basic example">
+                  <a class="btn btn-primary disabled" href="#">View/Edit</a>
+                  
+                  {% if site.disabled == "No" %}{% if site.under_maintenance == "No" %}
+                  <button type="button" class="btn btn-warning" data-toggle="modal" data-target="#maintModal-{{ site.site_id }}">Maintenance</button>
+                  {% elif site.under_maintenance == "Yes" %}
+                  <button type="button" class="btn btn-success" data-toggle="modal" data-target="#maintModal-{{ site.site_id }}">Production</button>
+                  {% endif %}{% endif %}
+
+                  {% if site.under_maintenance == "No" %}{% if site.disabled == "No" %}
+                  <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#disableModal-{{ site.site_id }}">Disable</button>
+                  {% elif site.disabled == "Yes" %}
+                  <button type="button" class="btn btn-success" data-toggle="modal" data-target="#disableModal-{{ site.site_id }}">Enable</button>
+                  {% endif %}{% endif %}
+                  
+                  <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#removeModal-{{ site.site_id }}">Remove</button>
+              </div>
+          </td>
+        
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    {% comment %} Create as many modals as sites {% endcomment %}
+    {% for site in sites %}
+    <!-- {{ site }} remove button -->
+    <div class="modal fade" id="removeModal-{{ site.site_id }}" tabindex="-1" role="dialog" aria-labelledby="removeModalPopup" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="removeModalLabel-{{ site.site_id }}">Please confirm your action</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            Would you really like to delete <b>{{ site.site_address }}</b> from the system?
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Dismiss</button>
+            <a class="btn btn-danger" href="{% url 'sites' %}delete/{{ site.site_id }}" id="confirm">Confirm</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- EOF {{ site }} remove button  -->
+    
+    <!-- {{ site }} disable button -->
+    <div class="modal fade" id="disableModal-{{ site.site_id }}" tabindex="-1" role="dialog" aria-labelledby="disableModalPopup" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="disableModalLabel-{{ site.site_id }}">Please confirm your action</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            {% if site.disabled == "No" %}
+            Would you really like to disable <b>{{ site.site_address }}</b>?
+            {% elif site.disabled == "Yes" %}
+            Would you really like to enable <b>{{ site.site_address }}</b>?
+            {% endif %}
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Dismiss</button>
+            <a class="btn btn-danger" href="{% url 'sites' %}disable/{{ site.site_id }}/{{ site.disabled }}" id="confirm">Confirm</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- EOF {{ site }} disable button  -->
+
+    <!-- {{ site }} maintenance button -->
+    <div class="modal fade" id="maintModal-{{ site.site_id }}" tabindex="-1" role="dialog" aria-labelledby="maintModalPopup" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="maintModalLabel-{{ site.site_id }}">Please confirm your action</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            {% if site.under_maintenance == "No" %}
+            Would you really like to put <b>{{ site.site_address }}</b> into maintenance mode?
+            {% elif site.under_maintenance == "Yes" %}
+            Would you really like to put <b>{{ site.site_address }}</b> into production mode?
+            {% endif %}
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Dismiss</button>
+            <a class="btn btn-danger" href="{% url 'sites' %}maintenance/{{ site.site_id }}/{{ site.under_maintenance }}" id="confirm">Confirm</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- EOF {{ site }} maintenance button  -->
+    {% endfor %}
+    {% comment %} EOF Create as many modals as sites {% endcomment %}
+
+</div>

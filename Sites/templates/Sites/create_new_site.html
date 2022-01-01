@@ -1,0 +1,134 @@
+{% extends "body.html" %}
+{% block content %}
+
+{% load static %}
+
+<div class="row text-center text-light pt-1 zagolovki"><h1>Create new site</h1></div>
+<!-- Paste _ novalidate _ into form to test it-->
+<form class="needs-validation" novalidate style="padding-left: 20%; padding-right: 20%;" action="{% url 'create_new_site' %}" method="post" name="create-site">
+  {% csrf_token %}
+  <div class="form-row" style="margin-bottom: 25px;">
+    <div class="col-md-8 text-light" style="margin-bottom: 5px; padding-right: 30px;">
+      <label for="validationFirstName">Frontend address:</label>
+      <input type="text" class="form-control" id="validationFrontEndAddress" name="FrontEndAddress" placeholder="gateway-it.com" value="" required>
+      <div class="valid-feedback">
+        Looks good!
+      </div>
+    </div>
+
+    <div class="col-md-12 mb-4 text-light">
+      <label class="form-check-label" for="validationWwwRedir">Redirect from WWW</label>
+      <input type="checkbox" checked class="form-check-input" id="validationWwwRedir" name="WwwRedir" style="margin-left: 3px;">
+
+      <label class="form-check-label" for="validationCertificate" style="margin-left: 50px;">Get SSL certificate for this domain</label>
+      <input type="checkbox" checked class="form-check-input" id="validationCertificate" name="Certificate" style="margin-left: 5px;">
+    </div>
+
+  </div>
+    
+  <div class="form-row" style="margin-bottom: 25px;">
+    <div class="col-md-12 text-light" style="margin-bottom: 5px;">
+      <label for="validationBackendServers">Backend servers (separate with coma and space)</label>
+        <input type="text" class="form-control" id="validationBackendServers" name="BackendServers" placeholder="wp-gateway-it-com-1 192.168.10.1:443, wp-gateway-it-com-2 192.168.10.2:443" aria-describedby="inputGroupPrepend" required>
+        <div class="invalid-feedback">
+          Please fix your input.
+        </div>
+    </div>
+
+    <div class="col-md-12 mb-4 text-light">
+        <label class="form-check-label" for="validationBackendHTTPs" style="margin-left: 3px;">HTTPs</label>
+        <input type="checkbox" checked class="form-check-input" id="validationBackendHTTPs" name="BackendHTTPs" style="margin-left: 3px;">
+  
+        <label class="form-check-label" for="validationBackendHTTP2" style="margin-left: 50px;">HTTP2</label>
+        <input type="checkbox" checked class="form-check-input" id="validationBackendHTTP2" name="BackendHTTP2" style="margin-left: 3px;">
+  
+        <label class="form-check-label" for="validationBackendCertificate" style="margin-left: 50px;">Ignore self-signed certs</label>
+        <input type="checkbox" checked class="form-check-input" id="validationBackendCertificate" name="BackendCertificate" style="margin-left: 5px;">
+    </div>
+
+  </div>
+  <div class="form-row" style="margin-bottom: 25px;">
+    <div class="col-md-4 text-light" style="margin-right: 35px;">
+      <label for="validationCreatedBy">Created by</label>
+      <select class="form-control" id="validationCreatedBy" name="CreatedBy">
+        {% for user in users %}
+        <option value="{{ user.username }}">{{ user }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    
+    <div class="col-md-4 mb-3 text-light">
+        <label for="validationManagedBy">Managed by</label>
+        <select class="form-control" id="validationManagedBy" name="ManagedBy">
+            {% for user in users %}
+            <option value="{{ user.username }}">{{ user }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="col-md-3 mb-3 text-light">
+        <label for="validationManagerRole">Manager role</label>
+        <select class="form-control" id="validationManagerRole" name="ManagerRole">
+          <option value="AdminUser">Admin (read-write-delete)</option>
+          <option value="ReadWriteUser">Read/Write (read-write-only)</option>
+          <option value="ReadOnlyUser">ReadOnly (read-only)</option>
+        </select>
+    </div>
+  
+  </div>
+
+    {% if success_message %}
+    <div>
+      <img src="{% static 'images/checked.png' %}" alt="" style="width: 3%;"> <span class="text-light">&nbsp; {{ success_message }}</span>
+    </div>
+    {% endif %}
+    <div>
+      <a href="{% url 'sites' %}" class="btn btn-secondary mt-4">&#8701; Go back to site list</a>
+      <button type="button" class="btn btn-primary mt-4" data-toggle="modal" data-target="#exampleModal">Submit</button>
+    </div>
+
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Please confirm this action</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            Are you sure you want to create this site?
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Dismiss</button>
+            <button type="submit" class="btn btn-primary" name="submit" value="Submit">Save changes</button>
+          </div>
+        </div>
+      </div>
+    </div>
+</form>
+
+<!-- <script>
+// Example starter JavaScript for disabling form submissions if there are invalid fields
+(function() {
+  'use strict';
+  window.addEventListener('load', function() {
+    // Fetch all the forms we want to apply custom Bootstrap validation styles to
+    var forms = document.getElementsByClassName('needs-validation');
+    // Loop over them and prevent submission
+    var validation = Array.prototype.filter.call(forms, function(form) {
+      form.addEventListener('submit', function(event) {
+        if (form.checkValidity() === false) {
+          event.preventDefault();
+          event.stopPropagation();
+        }
+        form.classList.add('was-validated');
+      }, false);
+    });
+  }, false);
+})();
+</script> -->
+
+<!-- <script src="{% static 'js/learning_js.js' %}"></script> -->
+
+{% endblock content %}

@@ -1,0 +1,47 @@
+/* This block addss table row numbers into empry table rows */
+table {
+    counter-reset: 0;
+  }
+  table tr {
+    counter-increment: row-num;
+  }
+  table tr td:first-child::before {
+      content: counter(row-num) "";
+  }
+/* EOF This block addss table row numbers into empry table rows */
+
+
+body{
+    background: rgb(53,58,64);
+    background: linear-gradient(159deg, rgba(53,58,64,1) 0%, rgba(0,0,0,1) 100%);
+}
+
+.plitki {
+    background: rgb(53,58,64);
+    background: linear-gradient(159deg, rgba(53,58,64,1) 0%, rgba(27,134,159,1) 83%, rgba(0,212,255,1) 97%, rgba(0,212,255,1) 100%);
+    /* display: flex;  */
+    /* justify-content: center;  */
+    /* align-items: center;  */
+    height: 330px;
+    padding: 15px 0px 15px 0px;
+}
+
+.zagolovki {
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+}
+
+.table td {
+    vertical-align: middle !important;
+}
+
+.table th {
+    vertical-align: middle !important;
+}
+
+.dropdown-menu > a:hover {
+    background-image: none !important;
+    background-color: rgba(0,212,255,1) !important;
+    /* color: black !important; */
+}

@@ -1,0 +1,87 @@
+<tr>
+    <td></td>
+    <td>{{ user.full_name }}</td>
+    <td>{{ user.username }}</td>
+    
+    {% if user.role == "Superadmin" %}
+    <td><span class="badge badge-primary">{{ user.role|lower }}</span></td>
+    {% elif user.role == "Admin" or user.role == "ReadWriteUser" %}
+    <td><span class="badge badge-success">{{ user.role|lower }}</span></td>
+    {% else %}
+    <td><span class="badge badge-warning">{{ user.role|lower }}</span></td>
+    {% endif %}
+    
+    <td>{{ user.site_admin_users.all.count|add:user.site_read_write_users.all.count|add:user.site_read_only_users.all.count }}</td>
+    
+    {% if user.locked_out == "No" %}
+    <td><span class="badge badge-success">{{ user.locked_out }}</span></td>
+    {% else %}
+    <td><span class="badge badge-danger">{{ user.locked_out }}</span></td>
+    {% endif %}
+    
+    {% if user.disabled == "No" %}
+    <td><span class="badge badge-success">{{ user.disabled }}</span></td>
+    {% else %}
+    <td><span class="badge badge-danger">{{ user.disabled }}</span></td>
+    {% endif %}
+    <td><span>{{ user.date_created }}</span></td>
+    <td>
+        <div class="btn-group d-flex along" role="group" aria-label="Basic example">
+            <button type="button" class="btn btn-primary disabled">View/Edit Profile</button>
+            {% if user.disabled == "No" %}
+            <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#disableModal-{{ user.username }}">Disable User</button>
+            {% else %}
+            <button type="button" class="btn btn-success" data-toggle="modal" data-target="#disableModal-{{ user.username }}">Enable User</button>
+            {% endif %}
+            <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#removeModal-{{ user.username }}">Remove</button>
+        </div>
+    </td>
+</tr>
+
+{% for user in users %}
+    <!-- {{ user }} remove button -->
+    <div class="modal fade" id="removeModal-{{ user.username }}" tabindex="-1" role="dialog" aria-labelledby="removeModalPopup" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="removeModalLabel-{{ user.username }}">Please confirm your action</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              Would you really like to remove user <b>{{ user }}</b> from the system?
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Dismiss</button>
+              <a class="btn btn-danger" href="{% url 'users' %}delete/{{ user.username }}" id="confirm">Confirm</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- EOF {{ user }} remove button  -->
+{% endfor %}
+
+{% for user in users %}
+    <!-- {{ user }} disable button -->
+    <div class="modal fade" id="disableModal-{{ user.username }}" tabindex="-1" role="dialog" aria-labelledby="disableModalPopup" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="disableModalLabel-{{ user.username }}">Please confirm your action</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              Would you really like to disable user <b>{{ user }}</b> on this system?
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Dismiss</button>
+              <a class="btn btn-danger" href="{% url 'users' %}disable/{{ user.username }}/{{ user.disabled }}" id="confirm">Confirm</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- EOF {{ user }} disable button  -->
+{% endfor %}

@@ -1,0 +1,132 @@
+{% extends "body.html" %}
+{% block content %}
+
+{% load static %}
+
+<div class="row text-center text-light pt-1 zagolovki"><h1>Create new user</h1></div>
+<!-- Paste _ novalidate _ into form to test it-->
+<form class="needs-validation" style="padding-left: 20%; padding-right: 20%;" action="{% url 'create_new_user' %}" method="post" name="create-user">
+  {% csrf_token %}
+  <div class="form-row">
+    <div class="col-md-4 mb-3 text-light">
+      <label for="validationFirstName">First name</label>
+      <input type="text" class="form-control" id="validationFirstName" name="FirstName" placeholder="First name" value="" required>
+      <div class="valid-feedback">
+        Looks good!
+      </div>
+    </div>
+    <div class="col-md-4 mb-3 text-light">
+      <label for="validationLastName">Last name</label>
+      <input type="text" class="form-control" id="validationLastName" name="LastName" placeholder="Last name" value="" required>
+      <div class="valid-feedback">
+        Looks good!
+      </div>
+    </div>
+    <div class="col-md-4 mb-3 text-light">
+      <label for="validationEmail">Email</label>
+      <input type="email" class="form-control" id="validationEmail" name="Email" placeholder="john.doe@gmail.com" value="" required>
+      <div class="valid-feedback">
+        Looks good!
+      </div>
+    </div>
+  </div>
+    
+  <div class="form-row">
+    <div class="col-md-5 mb-3 text-light">
+      <label for="validationCustomUsername">Username</label>
+      <div class="input-group">
+        <div class="input-group-prepend">
+          <span class="input-group-text" id="inputGroupPrepend">@</span>
+        </div>
+        <input type="text" class="form-control" id="validationCustomUsername" name="Username" placeholder="username" aria-describedby="inputGroupPrepend" required>
+        <div class="invalid-feedback">
+          Please choose a username.
+        </div>
+      </div>
+    </div>
+    <div class="col-md-5 mb-3 text-light">
+      <label for="validationPassword">Password</label>
+      <input type="password" class="form-control" id="validationPassword" name="Password" placeholder="SuperComplexPassword" value="" required>
+      <div class="valid-feedback">
+        Looks good!
+      </div>
+    </div>
+    <div class="col-md-2 mb-3 text-light">
+      <label for="validationUserId">User id</label>
+      <input type="number" class="form-control" id="validationUserId" name="UserId" placeholder="4" value="{{ users_last_id.user_id|add:1 }}" required>
+      <div class="valid-feedback">
+        Looks good!
+      </div>
+    </div>
+  </div>
+
+  <div class="form-row">
+    <div class="col-md-2 mb-3 text-light">
+      <label for="validationUserRole">User role</label>
+      <select class="form-control" id="validationUserRole" name="UserRole">
+        <option value="Superadmin">Super admin</option>
+        <option value="Admin">Admin</option>
+        <option value="User" selected="selected">User</option>
+      </select>
+    </div>
+
+  </div>
+  <!-- <button type="submit" class="btn btn-primary mt-4">Submit</button> -->
+  <!-- Button trigger modal -->
+    {% if success_message %}
+    <div>
+      <img src="{% static 'images/checked.png' %}" alt="" style="width: 3%;"> <span class="text-light">&nbsp; {{ success_message }}</span>
+    </div>
+    {% endif %}
+    <div>
+      <a href="{% url 'users' %}" class="btn btn-secondary mt-4">&#8701; Go back to user list</a>
+      <!-- <button type="button" class="btn btn-secondary mt-4" >Go back to user list</button> -->
+      <button type="button" class="btn btn-primary mt-4" data-toggle="modal" data-target="#exampleModal">Submit</button>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Please confirm this action</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            Are you sure you want to create this user?
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Dismiss</button>
+            <button type="submit" class="btn btn-primary" name="submit" value="Submit">Save changes</button>
+          </div>
+        </div>
+      </div>
+    </div>
+</form>
+
+<!-- <script>
+// Example starter JavaScript for disabling form submissions if there are invalid fields
+(function() {
+  'use strict';
+  window.addEventListener('load', function() {
+    // Fetch all the forms we want to apply custom Bootstrap validation styles to
+    var forms = document.getElementsByClassName('needs-validation');
+    // Loop over them and prevent submission
+    var validation = Array.prototype.filter.call(forms, function(form) {
+      form.addEventListener('submit', function(event) {
+        if (form.checkValidity() === false) {
+          event.preventDefault();
+          event.stopPropagation();
+        }
+        form.classList.add('was-validated');
+      }, false);
+    });
+  }, false);
+})();
+</script> -->
+
+<!-- <script src="{% static 'js/learning_js.js' %}"></script> -->
+
+{% endblock content %}

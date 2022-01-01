@@ -1,0 +1,184 @@
+{% extends "body.html" %}
+{% load mathfilters %}
+{% block content %}
+<div class="row text-center text-light pt-1 zagolovki"><h1>Overall statistics</h1></div>
+<div class="row">
+    <div class="col-md border-0 rounded mr-3 plitki text-light align-center">
+        <div class="d-flex justify-content-center">
+            <h4>Reverse Proxy Stats</h2>
+        </div>
+        <div class="d-flex justify-content-center">
+            <canvas id="reverseProxyStats" width="400" height="250"></canvas>
+                <script>
+                var ctx = document.getElementById('reverseProxyStats').getContext('2d');
+                var reverseProxyStats = new Chart(ctx, {
+                    type: 'pie',
+                    data: {
+                        labels: ['Active sites', 'Disabled sites', 'Active backends', 'Failed backends', 'Disabled backends',],
+                        datasets: [{
+                            label: '# of Votes',
+                            data: [ {{ sites_for_charts.count|sub:sites_for_charts_disabled.count|sub:sites_for_charts_under_maintenance.count }} , {{ sites_for_charts_disabled.count|add:sites_for_charts_under_maintenance.count }}, {{ sites_for_charts_backends_active.count|sub:sites_for_charts_backends_failed.count|sub:sites_for_charts_backends_disabled.count }}, {{ sites_for_charts_backends_failed.count }}, {{ sites_for_charts_backends_disabled.count }}],
+
+                            backgroundColor: [
+                                '{{ green_inner_color }}',    
+                                '{{ blue_inner_color }}',
+                                '{{ yellow_inner_color }}',
+                                '{{ red_inner_color }}',
+                                '{{ violet_inner_color }}',
+                                
+                            ],
+                            borderColor: [
+                                '{{ green_outer_color }}',
+                                '{{ blue_outer_color }}',    
+                                '{{ yellow_outer_color }}',
+                                '{{ red_outer_color }}',
+                                '{{ violet_outer_color }}',
+                                
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: false,
+                    
+                        plugins: {
+                            legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: 'white',
+                                font: {
+                                        size: 14,
+                                },
+                            title: {
+                            display: true,
+                            text: 'Chart.js Pie Chart'
+                            },
+                            }
+                        }
+                    }
+                }
+                });
+                </script>
+        </div>
+    </div>
+    <div class="col-md border-0 rounded mr-3 ml-3 plitki text-light">
+        <div class="d-flex justify-content-center">
+            <h4>Users</h2>
+        </div>
+        <div class="d-flex justify-content-center">
+            <canvas id="Users" width="400" height="250"></canvas>
+                <script>
+                var ctx = document.getElementById('Users').getContext('2d');
+                var Users = new Chart(ctx, {
+                    type: 'pie',
+                    data: {
+                        labels: ['Active', 'Disabled', 'Locked out'],
+                        datasets: [{
+                            label: '# of Votes',
+                            data: [{{ users_active.count|sub:users_disabled.count|sub:users_locked_out.count }}, {{ users_disabled.count }}, {{ users_locked_out.count }}],
+
+                            backgroundColor: [
+                                '{{ green_inner_color }}',
+                                '{{ yellow_inner_color }}',
+                                '{{ red_inner_color }}',
+                            ],
+                            borderColor: [
+                                '{{ green_outer_color }}',
+                                '{{ yellow_outer_color }}',
+                                '{{ red_outer_color }}',
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: false,
+                    
+                        plugins: {
+                            legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: 'white',
+                                font: {
+                                        size: 14,
+                                },
+                            title: {
+                            display: true,
+                            text: 'Chart.js Pie Chart'
+                            },
+                            }
+                        }
+                    }
+                }
+                });
+                </script>
+        </div>
+    </div>
+    <div class="col-md border-0 rounded ml-3 plitki text-light">
+        <div class="d-flex justify-content-center">
+            <h4>Certificates</h2>
+        </div>
+        <div class="d-flex justify-content-center">
+            <canvas id="Certificates" width="400" height="250"></canvas>
+                <script>
+                var ctx = document.getElementById('Certificates').getContext('2d');
+                var Certificates = new Chart(ctx, {
+                    type: 'pie',
+                    data: {
+                        labels: ['Active', 'Disabled', 'Expired'],
+                        datasets: [{
+                            label: '# of Votes',
+                            data: [{{ certificates_for_charts.count|sub:certificates_for_charts_disabled.count|sub:certificates_for_charts_expired.count }}, {{ certificates_for_charts_disabled.count }}, {{ certificates_for_charts_expired.count }}],
+
+                            backgroundColor: [
+                                '{{ green_inner_color }}',
+                                '{{ yellow_inner_color }}',
+                                '{{ red_inner_color }}',
+                            ],
+                            borderColor: [
+                                '{{ green_outer_color }}',
+                                '{{ yellow_outer_color }}',
+                                '{{ red_outer_color }}'
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: false,
+                    
+                        plugins: {
+                            legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: 'white',
+                                font: {
+                                        size: 14,
+                                },
+                            title: {
+                            display: true,
+                            text: 'Chart.js Pie Chart'
+                            },
+                            }
+                        }
+                    }
+                }
+                });
+                </script>
+        </div>
+    </div>
+</div>
+
+<div class="row text-center text-light pt-5 zagolovki"><h1>Recently created sites</h1></div>
+
+{% include "sites_table.html" %}
+
+<div class="row text-center text-light pt-5 zagolovki"><h1>New system users</h1></div>
+
+{% include "users_table.html" %}
+
+<div class="row text-center text-light pt-5 zagolovki"><h1>Recently created certificates</h1></div>
+{% include "certificates_table.html" %}
+
+<div>
+{% comment %} {{ sites_for_charts }} {% endcomment %}
+</div>
+{% endblock content %}

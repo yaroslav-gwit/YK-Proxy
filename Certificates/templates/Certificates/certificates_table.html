@@ -1,0 +1,55 @@
+<div class="row">
+    <table class="table table-dark table-hover border-0 rounded">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Domain name</th>
+            <th scope="col">Date created</th>
+            <th scope="col">Renewal dates</th>
+            <th scope="col">Created by:</th>
+            <th scope="col" class="d-flex justify-content-between align-items-center">Action
+              <span>
+                <a href="#" class="btn btn-primary disabled">Create a new certificate</a>
+                <a href="#" class="btn btn-info disabled">Refresh all</a>
+              </span>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for certificate in certificates %}
+          <tr>
+            <td></td>
+            <td>{{ certificate.domain_name }}</td>
+            <td>
+              <span class="badge  badge-secondary">Created: {{ certificate.date_created }}</span>
+              <br>
+              {% if date_now|date:'Y-m-d' < certificate.expiration_date|date:'Y-m-d' %}
+              <span class="badge badge-success">Valid until: {{ certificate.expiration_date }}</span>
+              {% else %}
+              <span class="badge badge-danger">Expired: {{ certificate.expiration_date }}</span>
+              {% endif %}
+            </td>
+            <td>
+              <span class="badge badge-secondary">Last renewed: {{ certificate.last_time_renewed }}</span>
+              <br>
+              <span class="badge badge-secondary">Next renewal: {{ certificate.next_renewal }}</span>
+            </td>
+            {% if certificate.created_by.role == "Superadmin" %}
+            <td>{{ certificate.created_by.username }} <span class="badge badge-primary">{{ certificate.created_by.role|lower }}</span></td>
+            {% elif certificate.created_by.role == "Admin" %}
+            <td>{{ certificate.created_by.username }} <span class="badge badge-success">{{ certificate.created_by.role|lower }}</span></td>
+            {% elif certificate.created_by.role == "User" %}
+            <td>{{ certificate.created_by.username }} <span class="badge badge-warning">{{ certificate.created_by.role|lower }}</span></td>
+            {% endif %}
+            <td>
+                <div class="btn-group d-flex along" role="group" aria-label="Basic example">
+                    <button type="button" class="btn btn-secondary disabled">Disable autorenewal</button>
+                    <button type="button" class="btn btn-warning disabled">Renew now</button>
+                    <button type="button" class="btn btn-info disabled">Refresh status</button>
+                </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+    </table>
+</div>
